@@ -1,8 +1,17 @@
+import React from 'react';
+import { Route, Switch } from 'react-router-dom';
+import PrivateLayout from './components/Layout/PrivateLayout';
+import HomePage from './pages/HomePage';
+
 const App = () => {
   return (
-    <div className="App">
-      <p>App</p>
-    </div>
+    <React.Fragment>
+      <PrivateLayout>
+        <Switch>
+          <Route path="/" exact component={HomePage} />
+        </Switch>
+      </PrivateLayout>
+    </React.Fragment>
   );
 }
 

@@ -3,13 +3,13 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import NavBar from '../Shared/NavBar';
 
-const PrivateLayout = () => {
+const PrivateLayout = ({ children }) => {
   return (
     <React.Fragment>
       <CssBaseline />
       <NavBar />
       <Container maxWidth="sm">
-        Container
+        {children}
       </Container>
     </React.Fragment>
   );

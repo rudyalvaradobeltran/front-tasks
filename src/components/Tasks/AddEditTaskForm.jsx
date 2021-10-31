@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Paper,
@@ -10,10 +10,16 @@ import {
   FormControlLabel,
   Checkbox
 } from '@mui/material';
+import { withRouter } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
-const AddTaskForm = () => {
+const AddEditTaskForm = (props) => {
+  const { id } = props.match.params;
+  const path = props.match.path.split('/')[1];
+
+  console.log(id, path);
+
   const validationSchema = yup.object().shape({
     description: yup.string()
       .required('Description is required')
@@ -40,7 +46,7 @@ const AddTaskForm = () => {
       <Paper>
         <Box px={3} py={2}>
           <Typography variant="h6" align="center" margin="dense">
-            Add task
+            {path === 'add-task' ? 'Add Task' : 'Edit Task'}
           </Typography>
           <Grid container spacing={1}>
             <Grid item xs={12} sm={12}>
@@ -103,4 +109,4 @@ const AddTaskForm = () => {
   );
 };
 
-export default AddTaskForm;
+export default withRouter(AddEditTaskForm);

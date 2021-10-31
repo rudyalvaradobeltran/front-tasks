@@ -8,7 +8,7 @@ const PrivateLayout = ({ children }) => {
     <React.Fragment>
       <CssBaseline />
       <NavBar />
-      <Container maxWidth="sm">
+      <Container maxWidth="md">
         {children}
       </Container>
     </React.Fragment>

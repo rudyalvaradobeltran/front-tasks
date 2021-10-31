@@ -1,9 +1,10 @@
-import React from 'react'
+import React from 'react';
+import ListTasksTable from '../../components/Tasks/ListTasksTable';
 
 const ListTasks = () => {
   return (
     <div>
-      ListTasks
+      <ListTasksTable />
     </div>
   )
 }

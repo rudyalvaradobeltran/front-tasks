@@ -18,8 +18,6 @@ const AddEditTaskForm = (props) => {
   const { id } = props.match.params;
   const path = props.match.path.split('/')[1];
 
-  console.log(id, path);
-
   const validationSchema = yup.object().shape({
     description: yup.string()
       .required('Description is required')
@@ -45,7 +43,7 @@ const AddEditTaskForm = (props) => {
     <React.Fragment>
       <Paper>
         <Box px={3} py={2}>
-          <Typography variant="h6" align="center" margin="dense">
+          <Typography id="title" variant="h6" align="center" margin="dense">
             {path === 'add-task' ? 'Add Task' : 'Edit Task'}
           </Typography>
           <Grid container spacing={1}>
@@ -74,6 +72,8 @@ const AddEditTaskForm = (props) => {
                     inputRef={register()}
                     render={({ field: { onChange } }) => (
                       <Checkbox
+                        id="active"
+                        name="active"
                         color="primary"
                         onChange={e => onChange(e.target.checked)}
                       />
@@ -96,11 +96,12 @@ const AddEditTaskForm = (props) => {
           </Grid>
           <Box mt={2}>
             <Button
+              id="saveButton"
               variant="contained"
               color="primary"
               onClick={handleSubmit(onSubmit)}
             >
-              Register
+              Save
             </Button>
           </Box>
         </Box>

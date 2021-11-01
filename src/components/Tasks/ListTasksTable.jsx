@@ -76,6 +76,8 @@ const ListTasksTable = () => {
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGrid
+        autoheight
+        id="taskTable"
         rows={rows}
         columns={columns}
         pagination

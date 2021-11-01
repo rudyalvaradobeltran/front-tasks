@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
-import { useDemoData } from '@mui/x-data-grid-generator';
+// import { useDemoData } from '@mui/x-data-grid-generator';
 import Button from '@mui/material/Button';
+import * as taskActions from '../../redux/actions/tasks.action';
 
-const loadServerRows = (page, data) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(data.rows.slice(page * 5, (page + 1) * 5));
-    }, Math.random() * 500 + 100); // simulate network latency
-  });
-}
+// const loadServerRows = (page, data) => {
+//   return new Promise((resolve) => {
+//     setTimeout(() => {
+//       resolve(data.rows.slice(page * 5, (page + 1) * 5));
+//     }, Math.random() * 500 + 100); // simulate network latency
+//   });
+// }
 
-const ListTasksTable = () => {
-  var { data } = useDemoData({
-    dataSet: 'Commodity',
-    rowLength: 100,
-    maxColumns: 4,
-  });
+const ListTasksTable = ({list, listState: {loading, tasks, error}}) => {
+  var data = [];
 
   const columns = [
     {
@@ -47,21 +46,19 @@ const ListTasksTable = () => {
 
   const [page, setPage] = useState(0);
   const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let active = true;
 
     (async () => {
-      setLoading(true);
-      const newRows = await loadServerRows(page, data);
+      const newRows = await list('');
 
+      console.log(newRows);
       if (!active) {
         return;
       }
 
       setRows(newRows);
-      setLoading(false);
     })();
 
     return () => {
@@ -92,4 +89,19 @@ const ListTasksTable = () => {
   );
 }
 
-export default ListTasksTable;
+ListTasksTable.propTypes = {
+  list: PropTypes.func.isRequired,
+  listState: PropTypes.object.isRequired
+};
+
+const { list } = taskActions;
+
+const mapStateToProps = ({ listState }) => {
+  return { listState };
+};
+
+const mapDispatchToProps = {
+  list
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ListTasksTable);

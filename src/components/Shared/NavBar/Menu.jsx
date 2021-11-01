@@ -5,7 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
-import { NavBarMenuItems } from '../../../config/NavBarMenuItems';
+import { NavBarMenuItemsConfig } from '../../../config/NavBarMenuItems';
 
 const Menu = (ToggleDrawer) => {
   return (
@@ -16,7 +16,7 @@ const Menu = (ToggleDrawer) => {
       onKeyDown={ToggleDrawer(false)}
     >
       <List>
-        {NavBarMenuItems.map((item) => (
+        {NavBarMenuItemsConfig.map((item) => (
           <ListItem
             button
             key={item.name}

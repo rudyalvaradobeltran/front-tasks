@@ -1,5 +1,7 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import {
   Paper,
   Box,
@@ -8,15 +10,17 @@ import {
   Typography,
   Button,
   FormControlLabel,
-  Checkbox
+  Checkbox,
+  CircularProgress
 } from '@mui/material';
 import { withRouter } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
+import * as taskActions from '../../redux/actions/tasks.action';
 import * as yup from 'yup';
 
-const AddEditTaskForm = (props) => {
-  const { id } = props.match.params;
-  const path = props.match.path.split('/')[1];
+const AddEditTaskForm = ({match, save, saveState: {loading, message, error}}) => {
+  const { id } = match.params;
+  const path = match.path.split('/')[1];
 
   const validationSchema = yup.object().shape({
     description: yup.string()
@@ -35,30 +39,30 @@ const AddEditTaskForm = (props) => {
     resolver: yupResolver(validationSchema)
   });
 
-  const onSubmit = data => {
-    console.log(JSON.stringify(data, null, 2));
+  const onSubmit = async (formData, e) => {
+    await save(formData, id);
   };
 
   return (
     <React.Fragment>
       <Paper>
         <Box px={3} py={2}>
-          <Typography id="title" variant="h6" align="center" margin="dense">
+          <Typography id='title' variant='h6' align='center' margin='dense'>
             {path === 'add-task' ? 'Add Task' : 'Edit Task'}
           </Typography>
           <Grid container spacing={1}>
             <Grid item xs={12} sm={12}>
               <TextField
                 required
-                id="description"
-                name="description"
-                label="Description"
+                id='description'
+                name='description'
+                label='Description'
                 fullWidth
-                margin="dense"
+                margin='dense'
                 {...register('description')}
                 error={errors.description ? true : false}
               />
-              <Typography variant="inherit" color="textSecondary">
+              <Typography variant='inherit' color='textSecondary'>
                 {errors.description?.message}
               </Typography>
             </Grid>
@@ -67,14 +71,14 @@ const AddEditTaskForm = (props) => {
                 control={
                   <Controller
                     control={control}
-                    name="active"
-                    defaultValue="false"
+                    name='active'
+                    defaultValue='false'
                     inputRef={register()}
                     render={({ field: { onChange } }) => (
                       <Checkbox
-                        id="active"
-                        name="active"
-                        color="primary"
+                        id='active'
+                        name='active'
+                        color='primary'
                         onChange={e => onChange(e.target.checked)}
                       />
                     )}
@@ -87,21 +91,28 @@ const AddEditTaskForm = (props) => {
                 }
               />
               <br />
-              <Typography variant="inherit" color="textSecondary">
+              <Typography variant='inherit' color='textSecondary'>
                 {errors.active
                   ? '(' + errors.active.message + ')'
                   : ''}
               </Typography>
             </Grid>
+            <Typography variant='inherit' color={error ? 'red' : 'green'}>
+              {message}
+            </Typography>
           </Grid>
           <Box mt={2}>
             <Button
-              id="saveButton"
-              variant="contained"
-              color="primary"
+              id='saveButton'
+              variant='contained'
+              color='primary'
+              disabled={loading}
               onClick={handleSubmit(onSubmit)}
             >
-              Save
+              <div>Save</div>
+              {loading &&
+                <CircularProgress size={20} />
+              }
             </Button>
           </Box>
         </Box>
@@ -110,4 +121,19 @@ const AddEditTaskForm = (props) => {
   );
 };
 
-export default withRouter(AddEditTaskForm);
+AddEditTaskForm.propTypes = {
+  save: PropTypes.func.isRequired,
+  saveState: PropTypes.object.isRequired
+};
+
+const { save } = taskActions;
+
+const mapStateToProps = ({ saveState }) => {
+  return { saveState };
+};
+
+const mapDispatchToProps = {
+  save
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(AddEditTaskForm));

@@ -1,12 +1,12 @@
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import { BrowserRouter as Router } from 'react-router-dom';
-import AddEditTaskForm from '../components/Tasks/AddEditTaskForm';
+import AddEditTaskForm from '../../components/Tasks/AddEditTaskForm';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Provider as ProviderRedux } from 'react-redux';
-import SetupStore from '../redux/SetupStore';
+import createTestStore from '../../redux/CreateTestStore';
 
-const store = SetupStore();
+const store = createTestStore();
 
 beforeEach(() => 
   act(async() => 
@@ -31,7 +31,7 @@ const fireWriteDescription = () =>
   );
 
 describe('when page is mounted', () => {
-  it('description input must be displayed', () => {
+  it('description input must be displayed', async() => {
     expect(screen.getByRole('textbox', { name: /description/i })).toBeInTheDocument();
   });
   it('active checkbox input must be displayed', () => {
@@ -49,6 +49,18 @@ describe('when user clicks the save button', () => {
     );
     expect(screen.getByText(/description is required/i)).toBeInTheDocument()
   });
-  it.todo('save button must be disabled until save is done and there must be a success message');
+  it('save button must be disabled until save is done', async() => {
+    expect(screen.getByRole('button', { id: /savebutton/i })).not.toBeDisabled();
+    await waitFor(() => 
+      fireWriteDescription()
+    );
+    expect(screen.getByRole('textbox', { name: /description/i })).toHaveValue(descriptionValue);
+    await waitFor(() => 
+      fireClickSave()
+    );
+    expect(screen.getByRole('button', { id: /savebutton/i })).toBeDisabled();
+    await act(async() => new Promise((r) => setTimeout(r, 3000)));
+    expect(screen.getByRole('button', { id: /savebutton/i })).not.toBeDisabled();
+  });
   it.todo('save button must display success message if task is saved');
 });

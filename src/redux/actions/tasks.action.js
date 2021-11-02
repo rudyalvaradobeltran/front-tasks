@@ -14,6 +14,12 @@ import {
 } from '../types/tasks.type';
 import APIService from '../../services/APIService';
 
+export const init = () => async (dispatch) => {
+  dispatch({
+    type: TASK_GET_BY_ID_INIT
+  });
+}
+
 export const save = (task, id) => async (dispatch) => {
   dispatch({
     type: TASK_SAVE_INIT
@@ -64,12 +70,12 @@ export const save = (task, id) => async (dispatch) => {
   });
 }
 
-export const list = (dataGridRequest) => async (dispatch) => {
+export const list = (page) => async (dispatch) => {
   dispatch({
     type: TASK_LIST_INIT
   });
 
-  const url = '/tasks/list/';
+  const url = `/tasks/list/${page}`;
 
   await APIService(
     {
@@ -77,19 +83,13 @@ export const list = (dataGridRequest) => async (dispatch) => {
       url: url,
       headers: {
         'Content-Type': 'application/json',
-      },
-      params: {
-        orderBy: dataGridRequest.orderBy,
-        order: dataGridRequest.order,
-        page: dataGridRequest.page,
-        rowsByPage: dataGridRequest.rowsByPage,
       }
     }
   ).then(res => {
     if (res.data !== null) {
       dispatch({
         type: TASK_LIST_SUCCESS,
-        payload: res.data.tasks
+        payload: res.data
       });
     } else {
       dispatch({
@@ -99,7 +99,7 @@ export const list = (dataGridRequest) => async (dispatch) => {
     }
   })
   .catch(error => {
-    if(error.response.status){
+    if(error.message){
       dispatch({
         type: TASK_LIST_FAILURE,
         payload: error.message
@@ -142,21 +142,15 @@ export const getById = (id) => async (dispatch) => {
     }
   })
   .catch(error => {
-    if(error.response.status){
+    if(error.message){
       dispatch({
         type: TASK_GET_BY_ID_FAILURE,
-        payload: {
-          status: error.response.status,
-          message : error.message
-        },
+        payload: error.message
       });
     }else{
       dispatch({
         type: TASK_GET_BY_ID_FAILURE,
-        payload: {
-          status: null,
-          message : error.message
-        },
+        payload: 'Oops something went wrong'
       });
     }
   });
@@ -191,21 +185,15 @@ export const removeById = (id) => async (dispatch) => {
     }
   })
   .catch(error => {
-    if(error.response.status){
+    if(error.message){
       dispatch({
         type: TASK_REMOVE_BY_ID_FAILURE,
-        payload: {
-          status: error.response.status,
-          message : error.message
-        },
+        payload: error.message
       });
     }else{
       dispatch({
         type: TASK_REMOVE_BY_ID_FAILURE,
-        payload: {
-          status: null,
-          message : error.message
-        },
+        payload: 'Oops something went wrong'
       });
     }
   });

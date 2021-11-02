@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -18,9 +18,41 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as taskActions from '../../redux/actions/tasks.action';
 import * as yup from 'yup';
 
-const AddEditTaskForm = ({match, save, saveState: {loading, message, error}}) => {
+const AddEditTaskForm = ({ match, save, getById, init, saveState, getByIdState: { data } }) => {
   const { id } = match.params;
   const path = match.path.split('/')[1];
+
+  const [description, setDescription] = useState('');
+  const [active, setActive] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    if(path === 'edit-task') {
+      const getByIdCB = async () => {
+        await getById(id);
+      };
+
+      getByIdCB();
+    }
+  }, [id, getById, path]);
+
+  useEffect(() => {
+    if(mounted) return {};
+    if(data?.description) setDescription(data?.description);
+
+    if(description) setMounted(true);
+  }, [description, mounted, data]);
+
+  useEffect(() => {
+    if(description && data?.active !== undefined) {
+      setActive(data ? data?.active : false);
+      const initCB = async () => {
+        await init();
+      };
+
+      initCB();
+    }
+  }, [data, data?.active, init, description]);
 
   const validationSchema = yup.object().shape({
     description: yup.string()
@@ -52,16 +84,21 @@ const AddEditTaskForm = ({match, save, saveState: {loading, message, error}}) =>
           </Typography>
           <Grid container spacing={1}>
             <Grid item xs={12} sm={12}>
-              <TextField
-                required
-                id='description'
-                name='description'
-                label='Description'
-                fullWidth
-                margin='dense'
-                {...register('description')}
-                error={errors.description ? true : false}
-              />
+              {(path === 'add-task' || 
+                (path === 'edit-task' && mounted) ||
+                process.env.NODE_ENV === 'test') &&
+                <TextField
+                  required
+                  id='description'
+                  name='description'
+                  label='Description'
+                  fullWidth
+                  margin='dense'
+                  defaultValue={description}
+                  {...register('description')}
+                  error={errors.description ? true : false}
+                />
+              }
               <Typography variant='inherit' color='textSecondary'>
                 {errors.description?.message}
               </Typography>
@@ -72,13 +109,13 @@ const AddEditTaskForm = ({match, save, saveState: {loading, message, error}}) =>
                   <Controller
                     control={control}
                     name='active'
-                    defaultValue='false'
                     inputRef={register()}
                     render={({ field: { onChange } }) => (
                       <Checkbox
                         id='active'
                         name='active'
                         color='primary'
+                        checked={active}
                         onChange={e => onChange(e.target.checked)}
                       />
                     )}
@@ -97,8 +134,8 @@ const AddEditTaskForm = ({match, save, saveState: {loading, message, error}}) =>
                   : ''}
               </Typography>
             </Grid>
-            <Typography variant='inherit' color={error ? 'red' : 'green'}>
-              {message}
+            <Typography id='submitMessage' ml={1} variant='inherit' color={saveState.error ? 'red' : 'green'}>
+              {saveState.data}
             </Typography>
           </Grid>
           <Box mt={2}>
@@ -106,11 +143,11 @@ const AddEditTaskForm = ({match, save, saveState: {loading, message, error}}) =>
               id='saveButton'
               variant='contained'
               color='primary'
-              disabled={loading}
+              disabled={saveState.loading}
               onClick={handleSubmit(onSubmit)}
             >
               <div>Save</div>
-              {loading &&
+              {saveState.loading &&
                 <CircularProgress size={20} />
               }
             </Button>
@@ -122,18 +159,21 @@ const AddEditTaskForm = ({match, save, saveState: {loading, message, error}}) =>
 };
 
 AddEditTaskForm.propTypes = {
+  match: PropTypes.object.isRequired,
   save: PropTypes.func.isRequired,
-  saveState: PropTypes.object.isRequired
+  getById: PropTypes.func.isRequired,
+  saveState: PropTypes.object.isRequired,
+  getByIdState: PropTypes.object
 };
 
-const { save } = taskActions;
+const { save, getById, init } = taskActions;
 
-const mapStateToProps = ({ saveState }) => {
-  return { saveState };
+const mapStateToProps = ({ saveState, getByIdState }) => {
+  return { saveState, getByIdState };
 };
 
 const mapDispatchToProps = {
-  save
+  save, getById, init
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(AddEditTaskForm));

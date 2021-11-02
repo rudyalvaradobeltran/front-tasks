@@ -15,7 +15,7 @@ import {
 
 const initialState = {
   loading: false,
-  message: null,
+  data: null,
   error: null
 };
 
@@ -27,7 +27,7 @@ export function saveReducer(state=initialState, action) {
     case TASK_SAVE_SUCCESS:
       return {
         ...state,
-        message: action.payload,
+        data: action.payload,
         loading: false,
         error: null
       };
@@ -53,7 +53,7 @@ export function listReducer(state=initialState, action) {
     case TASK_LIST_SUCCESS:
       return {
         ...state,
-        tasks: action.payload,
+        data: action.payload,
         loading: false,
         error: null
       };
@@ -73,12 +73,12 @@ export function listReducer(state=initialState, action) {
 export function getByIdReducer(state=initialState, action) {
   switch (action.type) {
     case TASK_GET_BY_ID_INIT:
-      return { ...state, loading: true };
+      return { ...state, data: null, loading: true };
 
     case TASK_GET_BY_ID_SUCCESS:
       return {
         ...state,
-        message: action.payload,
+        data: action.payload,
         loading: false,
         error: null
       };
@@ -103,7 +103,7 @@ export function removeByIdReducer(state=initialState, action) {
     case TASK_REMOVE_BY_ID_SUCCESS:
       return {
         ...state,
-        message: action.payload,
+        data: action.payload,
         loading: false,
         error: null
       };
